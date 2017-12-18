@@ -6,12 +6,12 @@ const userSchema = new mongoose.Schema(
     lastName: { type: String, required: true },
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    currentCompany: { type: mongoose.Schema.Types.ObjectId, ref: "company" },
+    currentCompany: { type: mongoose.Schema.Types.ObjectId, ref: "Company" },
     photo: String,
     experience: [
       {
         jobTitle: String,
-        company: { type: mongoose.Schema.Types.ObjectId, ref: "company" },
+        company: { type: mongoose.Schema.Types.ObjectId, ref: "Company" },
         startDate: Date,
         endDate: Date
       }
@@ -29,5 +29,22 @@ const userSchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
+userSchema.pre("save", user => {
+
+
+})
+
+userSchema.post("findOneAndUpdate", user => {
+    if (this.isModified(this.currentCompany){
+        if()
+
+    }
+})
+
+userSchema.pre("findOneAndRemove", user => {
+
+})
+
 
 module.exports = mongoose.model("User", userSchema);

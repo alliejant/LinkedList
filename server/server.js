@@ -27,6 +27,9 @@ app.use("/companies", companiesRouter);
 
 //error handler
 app.use((err, req, res, next) => {
+	console.error(err);
+
+	// toJSON for the Error object was just an empty object
 	res.json(err);
 });
 

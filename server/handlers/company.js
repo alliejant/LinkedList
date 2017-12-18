@@ -2,8 +2,8 @@ const { Company } = require("../models");
 
 function readCompanies(req, res, next) {
   Company.find()
-    .populate("user", "job")
-    .exec()
+    .populate("employees")
+    .populate("jobs")
     .then(companies => res.status(200).json({ data: companies }))
     .catch(err => next(err));
 }
@@ -19,8 +19,8 @@ function createCompany(req, res, next) {
 
 function readCompany(req, res, next) {
   Company.findOne({ handle: `@${req.params.handle}` })
-    .populate("user", "job")
-    .exec()
+    .populate("employees")
+    .populate("jobs")
     .then(company => res.status(200).json({ data: company }))
     .catch(err => next(err));
 }

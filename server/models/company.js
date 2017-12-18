@@ -9,13 +9,13 @@ const companySchema = new mongoose.Schema({
     employees: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "user"
+            ref: "User"
         }
     ],
     jobs: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "job"
+            ref: "Job"
         }
     ]
 });

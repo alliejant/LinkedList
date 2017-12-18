@@ -1,4 +1,4 @@
-const { User } = require("../models");
+const { User, Company } = require("../models");
 
 function readUsers(req, res, next) {
   User.find()
@@ -10,8 +10,24 @@ function createUser(req, res, next) {
   const newUser = new User(req.body.data);
   newUser
     .save()
-    .then(user => res.status(201).json({ data: user }))
-    .catch(err => next(err));
+    .then(user => {
+      if (user.currentCompany) {
+        Company.findByIdAndUpdate(user.currentCompany, {
+          $addToSet: { employees: user._id }
+        })
+          .then(company => {
+            res.status(201).json({ data: user });
+          })
+          .catch(err => {
+            return next(err);
+          });
+      }
+      res.send(201).json({ data: user });
+    })
+    .catch(err => {
+      console.log(err);
+      next(err);
+    });
 }
 
 function readUser(req, res, next) {
@@ -25,7 +41,27 @@ function updateUser(req, res, next) {
   User.findOneAndUpdate({ username: req.params.username }, req.body.data, {
     runValidators: true
   })
-    .then(user => res.status(200).json({ data: user }))
+    .then(user => {
+      if (user.currentCompany !== req.body.data.currentCompany) {
+        const oldCompanyPromise = Company.findByIdAndUpdate(
+          user.currentCompany,
+          {
+            $pull: { employees: user._id }
+          }
+        );
+        const newCompanyPromise = Company.findByIdAndUpdate(req.body, {
+          $addToSet: { employees: user._id }
+        });
+        Promise.all([oldCompanyPromise, newCompanyPromise])
+          .then(promises => {
+            res.status(201).json({ data: user });
+          })
+          .catch(err => {
+            return next(err);
+          });
+      }
+      res.status(200).json({ data: user });
+    })
     .catch(err => next(err));
 }
 
