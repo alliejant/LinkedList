@@ -6,7 +6,7 @@ const {ensureAuthenticated, ensureCorrectUser} = require("../helpers/auth")
 router
 	.route("")
 
-	.get(ensureAuthenticated, userHandler.readUsers)
+	.get(/*ensureAuthenticated,*/ userHandler.readUsers)
 	.post(userHandler.createUser);
 
 router 

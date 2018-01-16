@@ -2,24 +2,26 @@ const bcrypt = require("bcrypt");
 const { User, Company } = require("../models");
 var jwt = require("jsonwebtoken");
 
-var secret = "SECRET"
 function logIn(req, res, next) {
   // first - find a user by their username (which should always be unique)
-  User.findOne({ username: req.body.username })
+  User.findOne({ username: req.body.data.username })
     .then(
       function(user) {
+        console.log("user in Login", user);
+        console.log("username & password",req.body.data.username, req.body.data.password);
         // then check to see if their password is the same as the hashed one
-        user.comparePassword(req.body.password, function(err, isMatch) {
+        user.comparePassword(req.body.data.password, function(err, isMatch) {
+          console.log("isMatch", isMatch)
           if (isMatch) {
             // if so - they are logged in!
-            var token = jwt.sign({currentUser: user.username}, secret, {
+            var token = jwt.sign({currentUser: user.username}, "SECRET", {
               expiresIn: 60 * 60 // expire in one hour
             });
             res.status(200).json({message: 'Authenticated!',
             token: token
-            });
-           
+            });  
           } else {
+            console.log(err);
             res.status(400).json({ message: 'Invalid Credentials' });
           }
         });
@@ -39,8 +41,7 @@ function readUsers(req, res, next) {
 async function createUser(req, res, next) {
   try {
     const newUser = new User(req.body.data);
-    const hashedPassword = await bcrypt.hash(newUser.password, 10);
-    newUser.password = hashedPassword;
+    console.log("newUser", newUser);
     await newUser.save();
     if (newUser.currentCompany) {
       await Company.findByIdAndUpdate(newUser.currentCompany, {

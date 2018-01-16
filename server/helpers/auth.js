@@ -3,11 +3,16 @@ var jwt = require("jsonwebtoken");
 // Am I logged in? Check the token, see if it is valid and party on if so!
 exports.ensureAuthenticated = function(req, res, next){
     // go to the headers
+    if(req.headers['Authorization'] === undefined) {
+        return res.status(401).send({
+                message: 'INVALID TOKEN!'
+        })
+    }
     let authHeader = req.headers['Authorization']
     // grab the token
     let token = authHeader.split(" ")[1]
     // run jwt.verify on the token
-    jwt.verify(token, "HIDE ME!!! OR I WILL FIND YOU!!!", function(err, decoded){
+    jwt.verify(token, "SECRET", function(err, decoded){
         if(err){
             return res.status(401).send({
                 message: 'INVALID TOKEN!'
@@ -22,6 +27,11 @@ exports.ensureAuthenticated = function(req, res, next){
 // users/1 -> make sure an id of 1 is in the token!
 exports.ensureCorrectUser = function(req, res, next){
     // go to the headers
+    if(req.headers['Authorization'] === undefined) {
+        return res.status(401).send({
+                message: 'INVALID TOKEN!'
+        })
+    }
     let authHeader = req.headers['Authorization']
     // grab the token
     let token = authHeader.split(" ")[1]
